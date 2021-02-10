@@ -45,12 +45,14 @@ async function FairOSApi(method, url, formData, onData, onResult, onError, onAft
         else  onResult(JSON.stringify(res.data));
       }
 
-      if(onAfterGet!=undefined) onAfterGet(res.data); 
-      if(onAfterPost!=undefined) onAfterPost(res.data); 
+      if(onAfterGet!=undefined) 
+        onAfterGet(res.data); 
+      if(onAfterPost!=undefined) 
+        onAfterPost(res.data); 
 
     } catch(err)
     {
-      console.log("FairOSApi", err);
+      console.log("FairOSApi", err.response);
       if(onError!=undefined)
          if(err.response.data != undefined && err.response.data.message!=undefined)
           onError(err.response.data.message);

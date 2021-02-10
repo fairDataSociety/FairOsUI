@@ -43,8 +43,8 @@ const KVs = (props) =>  {
     function onError(response)
     {
         console.error("KVs", response);
-        if(response!=undefined && response.data!=undefined && response.data.message!=undefined)
-           setError(response.data.message.toString());
+        if(response!=undefined)
+          setError(response.toString());
         setStatus(null);
     }
     function selectTable(table)
@@ -80,34 +80,34 @@ const KVs = (props) =>  {
         var o = JSON.parse(kvData);
         console.log(atob(o.values));
         setStatusKey(atob(o.values));
-        setKvValue(atob(o.values))
+        setKvValue(atob(o.values));
+        setErrorKey(null);
     }
     function onStatusKey(podData)
     {
         console.log(podData);
         setStatusKey(podData);
         setErrorKey(null);
-        
     }
     function onStatusSeekKey(response)
     {
         console.error("KVs", response);
-        if(response!=undefined&&response.data!=undefined && response.data.message!=undefined)
-           setErrorSeekKey(response.data.message.toString());
+        if(response!=undefined)
+           setErrorSeekKey(response.toString());
         setStatusSeekKey(null);
     }
     function onErrorKey(response)
     {
         console.error("KVs", response);
-        if(response!=undefined&&response.data!=undefined && response.data.message!=undefined)
-           setErrorKey(response.data.message.toString());
+        if(response!=undefined)
+           setErrorKey(response.toString());
         setStatusKey(null);
     }
     function onErrorSeekKey(response)
     {
         console.error("KVs", response);
-        if(response.data!=undefined && response.data.message!=undefined)
-             setErrorSeekKey(response.data.message.toString());
+        if(response!=undefined)
+             setErrorSeekKey(response.toString());
         setStatus(null);
     }
 

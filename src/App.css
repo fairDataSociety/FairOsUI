@@ -120,9 +120,17 @@ a:hover  {
 .sideBySide{
   display: grid;
   grid-template-columns: 50% 50%;
+  min-height: 70vmin;
 }
 .leftSide {
 }
 .rightSide {
   margin-left: 20px;
+}
+
+.padLeft {
+  padding-left: 1.5em;
+}
+.padLeft2 {
+  padding-left: 2em;
 }

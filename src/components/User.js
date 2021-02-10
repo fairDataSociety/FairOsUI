@@ -20,7 +20,7 @@ const User = (props) =>  {
     const signupData = new FormData();   
     signupData.append("user", username); 
     signupData.append("password", password); 
-    signupData.append("mnemonic", mnemonic); 
+    signupData.append("mnemonic", props.mnemonic.toString().replace(/,/g," ")); 
     signupData.append("address", address); 
 
     const userData = new FormData();   
@@ -48,12 +48,12 @@ const User = (props) =>  {
          <hr/>
 
          <h2>Create new user</h2>
-           <BipSelector onMnemonicChange={props.onNewMnemonic} mnemonic={mnemonic}/>
+           <BipSelector onMnemonicChange={props.onNewMnemonic} mnemonic={props.mnemonic}/>
            <FairLink formData={signupData}  url={apiEndpoint + '/v0/user/signup'} description={"Signup"} onResult={setSignupStatus} onError={setSignupError} onData={props.onSignUp}/> 
            <div className="">{signupStatus}</div>
            <div className="fairError">{signupError}</div>
-           Address:{address}<br/>
-           Menmonic:{mnemonic}
+           Address: {props.address}<br/>
+           Menmonic: {props.mnemonic!=undefined ? props.mnemonic.toString() : null}
          <hr/>
   
          <h2>Import</h2>
