@@ -121,6 +121,8 @@ const KVs = (props) =>  {
     }
   
     return (<>
+    <div className="sideBySide">
+        <div className="leftSide">
             <h2>Table <strong>{kvTableName}</strong>  {status} </h2>
                 <>
                     {tables!=null ? tables.map((p,i)=>
@@ -133,10 +135,9 @@ const KVs = (props) =>  {
                             )}
                         </li>
                     ) : null}
-                    <hr/>
                 </>    
-
-            
+        </div>
+        <div className="rightSide">
                 Table Name: &nbsp;&nbsp;<input type="text" onChange={(e)=>setKvTableName(e.target.value)} value={kvTableName}></input> &nbsp; {status} <br/>
                 <div className="fairError">{error}</div>
                 <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/new'} description={"Create New Table"}      onResult={onStatus}   onError={onError} onAfterGet={FairOSApiGetTables}/> 
@@ -159,9 +160,10 @@ const KVs = (props) =>  {
                 <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/seek'} description={"Seek"}          onResult={onStatus}   onError={onErrorSeekKey}/> 
                 {/* <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/seek/next'}   description={"Next"} method="get"  onData={onKeyReceived} onResult={onStatusSeekKey} onError={onErrorSeekKey}/>  */}
                 <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/seek/next?name='+kvTableName}   description={"Next"} method="get"  onData={onKeyReceived} onResult={onStatusSeekKey} onError={onErrorSeekKey}/>
-            <hr/> 
+        </div>
+    </div>
 
-             
+    <hr/>
         <ul>
               <strong>KV Table APIs</strong>
               <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/new</li>

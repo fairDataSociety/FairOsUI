@@ -11,10 +11,11 @@ const User = (props) =>  {
   
     const [loginUserStatus, setLoginUserStatus] = useState(''); 
     const [importStatus, setImportStatus] = useState(''); 
-    const [createUserStatus, setCreateUserStatus] = useState(''); 
+    const [signupStatus, setSignupStatus] = useState(''); 
+    const [signupError, setSignupError] = useState(''); 
     const [presentStatus, setPresentStatus] = useState(''); 
     const [isLoggedStatus, setIsLoggedStatus] = useState(''); 
-    
+
   
     const signupData = new FormData();   
     signupData.append("user", username); 
@@ -24,37 +25,39 @@ const User = (props) =>  {
 
     const userData = new FormData();   
     userData.append("user", username); 
-    function CreateUserStatus(response)
+    function onSignupStatus(response)
     {
         console.error("PODs", response);
-        // if(response.data!=undefined && response.data.message!=undefined)
+        //if(response!=undefined && response.data!=undefined && response.data.message!=undefined)
         //    setDirError(response.data.message.toString());
-        // setDirStatus(null);
+        setSignupStatus(null);
     }
 
     function isLoggedin()
     {
         FairOSApi("get", apiEndpoint + '/v0/user/isloggedin?user='+username, userData, undefined, props.isLoggedIn, setIsLoggedStatus, undefined, undefined)
     }
+    //if(props.mnemonic===undefined) return <>Hmm</>
   
     return (<>
         <h2>User</h2>
-           Username: &nbsp;<input type="text" onChange={(e)=>setUser(e.target.value)}></input><br/>
-           Password: &nbsp;&nbsp;<input type="password" onChange={(e)=>setPassword(e.target.value)}></input> <br/>
+           Username: &nbsp;<input type="text" onChange={(e)=>setUser(e.target.value)} value={username}></input><br/>
+           Password: &nbsp;&nbsp;<input type="password" onChange={(e)=> {setPassword(e.target.value); props.onPassword(e.target.value); }} value={password}></input> <br/>
            <FairLink formData={signupData}  url={apiEndpoint + '/v0/user/login'} description={"Login"}  onResult={props.onLoginStatusChange} onError={setLoginUserStatus} onAfterGet={isLoggedin}/> 
            <div className="fairError">{loginUserStatus!=undefined ? loginUserStatus.toString(): "Error"}</div>
          <hr/>
 
          <h2>Create new user</h2>
-           <BipSelector onMnemonicChange={setMnemonic}/> 
-           <FairLink formData={signupData}  url={apiEndpoint + '/v0/user/signup'} description={"Signup"} onResult={props.onSignup} onError={CreateUserStatus}/> 
-           <div className="fairError">{createUserStatus}</div>
+           <BipSelector onMnemonicChange={props.onNewMnemonic} mnemonic={mnemonic}/>
+           <FairLink formData={signupData}  url={apiEndpoint + '/v0/user/signup'} description={"Signup"} onResult={setSignupStatus} onError={setSignupError} onData={props.onSignUp}/> 
+           <div className="">{signupStatus}</div>
+           <div className="fairError">{signupError}</div>
+           Address:{address}<br/>
+           Menmonic:{mnemonic}
          <hr/>
   
          <h2>Import</h2>
            <strong>user: </strong>{username.toString()}<br/>
-           {/* <strong>pass: </strong>{password.toString()}<br/> */}
-           {/* <strong>address: </strong>{address.toString()}<br/> */}
            <strong>mnemonic: </strong>{mnemonic.toString()}<br/>
            <FairLink formData={signupData}  url={apiEndpoint + '/v0/user/import'} description={"Import"} onResult={props.onLoginStatusChange} onError={setImportStatus}/> 
            <div className="fairError">{importStatus}</div>

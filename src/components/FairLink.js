@@ -33,8 +33,11 @@ async function FairOSApi(method, url, formData, onData, onResult, onError, onAft
     {
       const res = await FairOSPost(method, url, formData);
       console.log(res.data);
-
-      if(onData!=undefined) onData(res.data);
+      if(onData!=undefined) 
+      {
+        
+        onData(res.data);
+      }
       if(onResult!=undefined)
       {
         if(res.data.message!=undefined) onResult(res.data.message);
@@ -49,7 +52,10 @@ async function FairOSApi(method, url, formData, onData, onResult, onError, onAft
     {
       console.log("FairOSApi", err);
       if(onError!=undefined)
-        onError(err.response);
+         if(err.response.data != undefined && err.response.data.message!=undefined)
+          onError(err.response.data.message);
+         else 
+          onError(err.response.toString());
     }
 }
 
@@ -57,14 +63,9 @@ async function FairOSApi(method, url, formData, onData, onResult, onError, onAft
 const FairLink = ({description, method, url, formData, onData, onResult, onError, onAfterGet, onAfterPost}) => {
     method = (method === undefined ? method='post' : method);
     async function onFairLinkClick() {
-      
       FairOSApi(method, url, formData, onData, onResult, onError, onAfterGet, onAfterPost );
     }
-    return (
-    <>
-       <button className="fairLink" onClick={(e)=>onFairLinkClick(e)}>{description}</button>
-       {/* <small>{method} {url}  <small>{text}</small> </small> */}
-    </>);
+    return (<button className="fairLink" onClick={(e)=>onFairLinkClick(e)}>{description}</button>);
   }
   
   export { FairLink, FairOSApi };

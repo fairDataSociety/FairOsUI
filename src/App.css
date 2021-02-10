@@ -116,3 +116,13 @@ a:hover  {
   animation-name: buttonAppear;
   animation-duration: 1s;    
 }
+
+.sideBySide{
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.leftSide {
+}
+.rightSide {
+  margin-left: 20px;
+}

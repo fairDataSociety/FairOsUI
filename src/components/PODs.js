@@ -18,7 +18,7 @@ const PODs = (props) => {
     podData.append("user", username); 
     podData.append("password", password); 
     podData.append("pod", podname); 
-    
+
     const dirData = () =>
     {
         const dirData = new FormData();   
@@ -92,15 +92,18 @@ const PODs = (props) => {
 
     return (
         <>
-            <h2>POD <strong>{podname}</strong></h2>
-            <>
-             {pod_name.map((p,i)=>
-                <li key={"pod" + i}>
-                  <strong onClick={(e)=>selectPod(p)}>{p}</strong><br/>
-                </li>
-             )}
-             <hr/>
-            </>  
+        <div className="sideBySide">
+            <div className="leftSide">
+                <h2>POD <strong>{podname}</strong></h2>
+                <>
+                {pod_name.map((p,i)=>
+                    <li key={"pod" + i}>
+                    <strong onClick={(e)=>selectPod(p)}>{p}</strong><br/>
+                    </li>
+                )}
+                </>  
+            </div>        
+            <div className="rightSide">
 
                 {/* Username: &nbsp;<input type="text" onChange={(e)=>setUser(e.target.value)} value={username}></input><br/> */}
                 {/* Password: &nbsp;&nbsp;<input type="password" onChange={(e)=>setPassword(e.target.value)} value={password}></input> <br/> */}
@@ -121,7 +124,9 @@ const PODs = (props) => {
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/ls?dir='+dir_with_path} description={"List"} method="get" onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiGetDirectory}/>  
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/stat?dir='+dir_with_path} description={"Stat"}  method="get" onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiGetDirectory}/>  
             <div className="fairError">{dirError}</div>
-
+            </div>
+        </div>
+        <hr/> 
             <ul> <strong>POD APIs</strong>
                 <li>POST -F 'password=\{password}' -F 'pod=\{podname}' {apiEndpoint}/v0/pod/new</li>
                 <li>POST -F 'password=\{password}' -F 'pod=\{podname}' {apiEndpoint}/v0/pod/open</li>

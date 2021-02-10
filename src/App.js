@@ -19,15 +19,19 @@ function App() {
   const [apiEndpoint, setApiEndpoint] = useState('https://api.fairos.io');
   const [user, setUser] = useState(localStorage.getItem("user") ? null : 'testx12345612');
   const [password, setPassword] = useState('testx12345612testx12345612');
-  const [mnemonic, setMnemonic] = useState('');
-  const [address, setAddress]   = useState('');
+  const [mnemonic, setMnemonic] = useState([]);
+  const [address, setAddress]   = useState('0x');
   const [loginStatus, setLoginStatus]   = useState('not logged in');
   const [isLoggedIn, setIsLoggedIn]   = useState(false);
 
   function onSignup(data)
   {
     setAddress(data.address);
-    setMnemonic(data.mnemonic);
+    setMnemonic(data.mnemonic.split(" "));
+  }
+  function onNewMnemonic(mnemonic)
+  {
+    setMnemonic(mnemonic);
   }
 
   return (
@@ -54,7 +58,9 @@ function App() {
                 <Settings />
               </Route>
               <Route path="/user">
-                  <User apiEndpoint={apiEndpoint} user={user} password={password} mnemonic={mnemonic} address={address} onLoginStatusChange={setLoginStatus} isLoggedIn={setIsLoggedIn} onSignUp={onSignup}/>
+                  <User apiEndpoint={apiEndpoint} user={user} password={password} mnemonic={mnemonic}  address={address} onNewMnemonic={onNewMnemonic} onPassword={setPassword} onLoginStatusChange={setLoginStatus} isLoggedIn={setIsLoggedIn} onSignUp={onSignup}/>
+                  Address:{address}<br/>
+                  Mnemonic:{mnemonic.toString()}                
               </Route>
 
               {isLoggedIn===true ?

@@ -97,47 +97,52 @@ const DOCs = (props) =>  {
     }
   
     return (<>
-            <h2>DOCs <strong>{documentTableName}</strong>  {status} </h2>
-                <>
-                    {documents!=null ? documents.map((d,i)=>
-                        <li key={"doc" + i}>
-                          <strong onClick={(e)=>selectDocument(d)}>{d.name}</strong> <span>{d.type}</span>
-                           {d.indexes.map((k,j)=>
-                                <small key={"index" + k}>
-                                    <small onClick={(e)=>selectIndex(k)}> ({k.name} {k.type})</small><br/>
-                                </small>
-                            )}  
-                        </li>
-                    ) : null}
-                    <hr/>
-                </>    
+    <div className="sideBySide">
+        <div className="leftSide">
+                <h2>DOCs <strong>{documentTableName}</strong>  {status} </h2>
+                    <>
+                        {documents!=null ? documents.map((d,i)=>
+                            <li key={"doc" + i}>
+                            <strong onClick={(e)=>selectDocument(d)}>{d.name}</strong> <span>{d.type}</span>
+                            {d.indexes.map((k,j)=>
+                                    <small key={"index" + k}>
+                                        <small onClick={(e)=>selectIndex(k)}> ({k.name} {k.type})</small><br/>
+                                    </small>
+                                )}  
+                            </li>
+                        ) : null}
+                    </>    
+        </div>
+        <div className="rightSide">
+                    Document Name: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentTableName(e.target.value)} value={documentTableName}></input> &nbsp; {status} <br/>
+                    <div className="fairError">{error}</div>
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/new'}  description={"Create New DOC"}     onResult={onStatus}   onError={onError} onAfterGet={FairOSApiGetDocuments}/> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/open'} description={"Open"}              onResult={onStatus}   onError={onError}/> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/ls'}     description={"List"}      method="get"    onData={onDOCsReceived}  onError={onError}/> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
+                    
+                <hr/> 
+                    Expression: &nbsp;&nbsp;<input type="text" onChange={(e)=>setExpression(e.target.value)} value={expression} ></input> &nbsp; {statusExpression} <br/>
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/count'} description={"Count"} onResult={onStatusExpression}   onError={onErrorExpression} /> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/find'}  description={"Find"}  onResult={onStatusExpression}   onError={onErrorExpression} /> 
 
-            
-                Document Name: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentTableName(e.target.value)} value={documentTableName}></input> &nbsp; {status} <br/>
-                <div className="fairError">{error}</div>
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/new'}  description={"Create New DOC"}     onResult={onStatus}   onError={onError} onAfterGet={FairOSApiGetDocuments}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/open'} description={"Open"}              onResult={onStatus}   onError={onError}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/ls'}     description={"List"}      method="get"    onData={onDOCsReceived}  onError={onError}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
-                
-            <hr/> 
-                Expression: &nbsp;&nbsp;<input type="text" onChange={(e)=>setExpression(e.target.value)} value={expression} ></input> &nbsp; {statusExpression} <br/>
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/count'} description={"Count"} onResult={onStatusExpression}   onError={onErrorExpression} /> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/find'}  description={"Find"}  onResult={onStatusExpression}   onError={onErrorExpression} /> 
+                <hr/> 
+                    JSON Data: <br/><textarea type="textarea" onChange={(e)=>setJsonDocumentInBytes(e.target.value)} value={jsonDocumentInBytes} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/put'}  description={"Put"} onResult={onStatusExpression}   onError={onErrorExpression} /> <br/>
 
-            <hr/> 
-                JSON Data: <br/><textarea type="textarea" onChange={(e)=>setJsonDocumentInBytes(e.target.value)} value={jsonDocumentInBytes} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/put'}  description={"Put"} onResult={onStatusExpression}   onError={onErrorExpression} /> <br/>
+                    DocumentId: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentId(e.target.value)} value={documentId}></input> &nbsp; {statusExpression} <br/>
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/get?id'+documentId+'&name='+documentTableName}  description={"Get"}  method="get" onResult={onStatusExpression}   onError={onErrorExpression} /> 
 
-                DocumentId: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentId(e.target.value)} value={documentId}></input> &nbsp; {statusExpression} <br/>
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/get?id'+documentId+'&name='+documentTableName}  description={"Get"}  method="get" onResult={onStatusExpression}   onError={onErrorExpression} /> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
+                <hr/> 
+                    JSON: <br/>
+                    <textarea type="textarea" onChange={(e)=>setJsonFile(e.target.value)} value={jsonFile} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
-            <hr/> 
-                JSON: <br/>
-                <textarea type="textarea" onChange={(e)=>setJsonFile(e.target.value)} value={jsonFile} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
-
-             
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/loadjson'} description={"Load"}  onResult={onStatus} onError={onError}/> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/indexjson'} description={"index"}  onResult={onStatus} onError={onError}/> 
+        </div>
+    </div>
+        <hr/>
         <ul>
               <strong>DOCs  APIs</strong>
               <li>POST -F 'name=\{documentTableName}' {apiEndpoint}/v0/doc/new</li>
@@ -158,7 +163,7 @@ const DOCs = (props) =>  {
               <li>POST -F 'name=\{documentTableName}' -F 'json=@\{jsonFile}' {apiEndpoint}/v0/doc/loadjson</li>
               <li>POST -F 'name=\{documentTableName}' -F 'file=\{podFile}' {apiEndpoint}/v0/doc/indexjson</li>
         </ul>
-      </>
+    </>
       );
   }
 

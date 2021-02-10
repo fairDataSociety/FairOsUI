@@ -19,8 +19,7 @@ const BipSelector = (props) => {
     const [mnemonic, setMnemonic] = useState(props.mnemonic==undefined || props.mnemonic===null ? getRandom(bip39english,12) : props.mnemonic);  
     function refreshMnemonic()
     {
-        setMnemonic(getRandom(bip39english,12)); 
-        props.onMnemonicChange(mnemonic);
+        setNewMnemonic(getRandom(bip39english,12)); 
     }
     function setNewMnemonic(mn)
     {
