@@ -18,20 +18,7 @@ const PODs = (props) => {
     podData.append("user", username); 
     podData.append("password", password); 
     podData.append("pod", podname); 
-    /*function podData()
-    {
-        var data = new FormData();   
-        data.append("user", username); 
-        data.append("password", password); 
-        data.append("pod", podname);         
-        return data;
-    }*/
-
-    // const dirData = new FormData();   
-    // dirData.append("dir", dir_with_path); 
-    // podData.append("user", username); 
-    // podData.append("password", password); 
-    // podData.append("pod", podname); 
+    
     const dirData = () =>
     {
         const dirData = new FormData();   

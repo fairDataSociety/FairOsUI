@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import BipSelector from './bipselector'; 
 import { FairLink, FairOSApi } from './FairLink'; 
 
 const KVs = (props) =>  {
