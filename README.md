@@ -1,3 +1,8 @@
+# FairOS Web UI 
+This project allows you to manipulate your PODs, KVs and DOCs through your browser. 
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

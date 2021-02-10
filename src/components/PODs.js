@@ -53,7 +53,7 @@ const PODs = (props) => {
     {
         console.log(podData);
         setDirStatus(podData);
-        setDirError(null);
+        setDirError(null);  
     }
     function onError(response)
     {
