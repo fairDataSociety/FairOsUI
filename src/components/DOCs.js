@@ -12,8 +12,8 @@ const DOCs = (props) =>  {
     const [end, setEnd] = useState(5); // 
     const [noRecords, setNoRecords] = useState(5); // 
 
-    const [jsonFile, setJsonFile] = useState('{"sample":"value"}'); // 
-    const [podFile, setPodFile] = useState('{"sample":"value"}'); // 
+    const [jsonFile, setJsonFile] = useState('{"jsonSample":"jsonValue"}'); // 
+    const [podFile, setPodFile] = useState('{"podSample":"podValue"}'); // 
     const [jsonDocumentInBytes, setJsonDocumentInBytes] = useState(null); // 
 
     const [status, setStatus] = useState(null);    // 
@@ -36,6 +36,7 @@ const DOCs = (props) =>  {
     docData.append("value", docValue); 
     docData.append("limit", noRecords); 
     docData.append("expr", expression); 
+    docData.append("id", documentId); 
     
     useEffect(() => {
         FairOSApiGetDocuments();
@@ -120,24 +121,21 @@ const DOCs = (props) =>  {
                 <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
                 
             <hr/> 
-                Expression: &nbsp;&nbsp;<input type="text" onChange={(e)=>setExpression(e.target.value)} value={expression}></input> &nbsp; {statusExpression} <br/>
+                Expression: &nbsp;&nbsp;<input type="text" onChange={(e)=>setExpression(e.target.value)} value={expression} ></input> &nbsp; {statusExpression} <br/>
                 <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/count'} description={"Count"} onResult={onStatusExpression}   onError={onErrorExpression} /> 
                 <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/find'}  description={"Find"}  onResult={onStatusExpression}   onError={onErrorExpression} /> 
 
-            {/* <h3>Key <strong>{documentTableName}</strong>.{kvKey} </h3>
-            Key Name: &nbsp;&nbsp;<input type="text" onChange={(e)=>setKvKey(e.target.value)} value={kvKey}></input> &nbsp; {statusKey} <br/>
-            Key Value: &nbsp;&nbsp;<input type="text" onChange={(e)=>setKvValue(e.target.value)} value={kvValue}></input>  <br/>
-                <div className="fairError">{errorKey}</div>
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/kv/entry/put'} description={"Put"}      onResult={onStatusKey}   onError={onErrorKey}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/kv/entry/get?name='+kvTableName+'&key='+kvKey} description={"Get"}  method="get"  onResult={onStatusKeyValue}   onError={onErrorKey}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/kv/entry/del'} description={"Delete*"}  method="delete" onResult={onStatusKey}   onError={onErrorKey}/> 
             <hr/> 
+                JSON Data: <br/><textarea type="textarea" onChange={(e)=>setJsonDocumentInBytes(e.target.value)} value={jsonDocumentInBytes} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
+                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/put'}  description={"Put"} onResult={onStatusExpression}   onError={onErrorExpression} /> <br/>
 
-                <div className="fairError">{errorSeekKey}</div>                
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/kv/loadcsv'} description={"Load CSV"}   onResult={onStatusSeekKey}   onError={onErrorSeekKey}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/kv/seek'} description={"Seek"}          onResult={onStatus}   onError={onErrorSeekKey}/> 
-                <FairLink formData={docData}  url={apiEndpoint + '/v0/kv/seek/next?name='+kvTableName}   description={"Next"} method="get"  onData={onKeyReceived} onResult={onStatusSeekKey} onError={onErrorSeekKey}/>
-            <hr/>  */}
+                DocumentId: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentId(e.target.value)} value={documentId}></input> &nbsp; {statusExpression} <br/>
+                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/get?id'+documentId+'&name='+documentTableName}  description={"Get"}  method="get" onResult={onStatusExpression}   onError={onErrorExpression} /> 
+
+                <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
+            <hr/> 
+                JSON: <br/>
+                <textarea type="textarea" onChange={(e)=>setJsonFile(e.target.value)} value={jsonFile} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
 
              
         <ul>
@@ -151,8 +149,9 @@ const DOCs = (props) =>  {
         <ul>  <strong>DOCs Search APIs</strong>
               <li>POST -F 'name=\{documentTableName}' -F 'expr=\{expression}' {apiEndpoint}/v0/doc/count</li>
               <li>POST -F 'name=\{documentTableName}' -F 'expr=\{expression}' -F 'limit=\{noRecords}' {apiEndpoint}/v0/doc/find</li>
+        </ul>
               
-              
+        <ul>  <strong>DOCs Entry APIs</strong>
               <li>POST -F 'name=\{documentTableName}' -F 'doc=\{jsonDocumentInBytes}' {apiEndpoint}/v0/doc/entry/put</li>
               <li>GET -F 'name=\{documentTableName}' -F 'id=\{documentId}' {apiEndpoint}/v0/doc/entry/get</li>
               <li>DELETE -F 'name=\{documentTableName}' -F 'id=\{documentId}' {apiEndpoint}/v0/doc/entry/del</li>
