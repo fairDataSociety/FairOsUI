@@ -127,7 +127,7 @@ const KVs = (props) =>  {
                 <>
                     {tables!=null ? tables.map((p,i)=>
                         <li key={"pod" + i}>
-                        <strong onClick={(e)=>selectTable(p)}>{p.name}</strong>
+                        <strong onClick={(e)=>selectTable(p)} className={p.name==kvTableName ? "selected" : ""}>{p.name}</strong>
                            {p.indexes.map((d,j)=>
                                 <small key={"index" + j}>
                                     <small onClick={(e)=>selectIndex(d)}> ({d})</small><br/>

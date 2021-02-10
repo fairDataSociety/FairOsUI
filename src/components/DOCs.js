@@ -57,16 +57,16 @@ const DOCs = (props) =>  {
     function onErrorExpression(response)
     {
         console.error("DOCs", response);
-        //if(response!=undefined && response.data!=undefined && response.data.message!=undefined)
-        //    setErrorExpression(response.data.message.toString());
+        if(response!=undefined)
+            setErrorExpression(response.toString());
 
         //setStatusExpression(null);
     }
     function onError(response)
     {
         console.error("DOCs", response);
-        if(response!=undefined && response.data!=undefined && response.data.message!=undefined)
-           setError(response.data.message.toString());
+        if(response!=undefined)
+           setError(response.toString());
         setStatus(null);
     }
     function selectDocument(doc)
@@ -103,7 +103,7 @@ const DOCs = (props) =>  {
                     <>
                         {documents!=null ? documents.map((d,i)=>
                             <li key={"doc" + i}>
-                            <strong onClick={(e)=>selectDocument(d)}>{d.name}</strong> <span>{d.type}</span>
+                            <strong onClick={(e)=>selectDocument(d)} className={d.name==documentTableName ? "selected" : ""}>{d.name}</strong> <span>{d.type}</span>
                             {d.indexes.map((k,j)=>
                                     <small key={"index" + k}>
                                         <small onClick={(e)=>selectIndex(k)}> ({k.name} {k.type})</small><br/>

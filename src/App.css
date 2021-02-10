@@ -134,3 +134,6 @@ a:hover  {
 .padLeft2 {
   padding-left: 2em;
 }
+.selected {
+  color: rgb(255, 166, 151);
+}

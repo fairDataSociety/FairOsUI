@@ -129,7 +129,7 @@ const PODs = (props) => {
                 <>
                 {pod_name.map((p,i)=>
                     <li key={"pod" + i}>
-                      <strong onClick={(e)=>selectPod(p)}>{p}</strong><br/>
+                      <strong onClick={(e)=>selectPod(p)} className={p==podname ? "selected" : ""}>{p}</strong><br/>
 
                       {p===podname ?
                         <span> 
