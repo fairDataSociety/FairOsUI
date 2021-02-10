@@ -1,38 +1,92 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  text-align: left;
+  font-size: calc(6px + 1vmin);
+  color: rgb(212, 208, 199);
 }
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(6, 1fr);
+  grid-row: auto auto auto auto auto;
+  //grid-auto-rows: 100px;
+  align-items: start;
+  align-items: center;
+  justify-content: center;  
+  text-align: right;
+  padding: 1% 1% 1% 1%;
+  font-size: calc(8px + 2vmin);
 }
 
-.App-link {
-  color: #61dafb;
+.App-body {
+  background-color: #585858;
+  min-height: 95vh;
+  display: block;
+  padding: 1% 1% 1% 1%;
+  align-items: normal;
+  justify-content: right;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-banner {
+  background-color:#282c34;
+  min-height: 0.2vh;
+  display: block;
+  padding: 0% 0% 0.3% 0.3%;
+  align-items: right;
+  justify-content: right;
+  text-align: right;
+  font-size: calc(6px + 0.5vmin);
+}
+
+@keyframes linkAppear {
+  from {background-color: rgb(216, 140, 0);}
+  to {background-color: transparent;}
+}
+@keyframes buttonAppear {
+  from {background-color: rgb(216, 140, 0);}
+  to {background-color: rgb(212, 208, 199);}
+}
+
+
+a {
+  color: rgb(216, 140, 0);
+  text-decoration: none;
+  animation-name: linkAppear;
+  animation-duration: 1s;
+}
+a:visited  {
+  color: rgb(226, 140, 0);
+  
+}
+a:hover  {
+  color: rgb(226, 102, 0);
+  text-decoration:underline;
+  animation-name: linkAppear;
+  animation-duration: 1s;
+}
+
+.customdropdown {
+  text-align: right;
+  display: block;
+}
+
+.fairLink {
+  font-weight: 500;
+  font-size: calc(8px + 1vmin);
+  padding: 2px 5px 2px 5px;
+  margin: 5px 5px 5px 5px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 8px;
+  background: rgb(212, 208, 199);
+  border-color: rgb(212, 208, 199);
+  animation-name: buttonAppear;
+  animation-duration: 1s;  
+}
+.fairError {
+  color: rgb(255, 89, 60);
+  animation-name: buttonAppear;
+  animation-duration: 1s;    
 }
