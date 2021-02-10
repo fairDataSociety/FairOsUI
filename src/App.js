@@ -1,22 +1,18 @@
 import './App.css';
 import React, { useState } from 'react';
 
-import { Dropdown } from 'react-bootstrap';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import FairosSelector from './components/FairosSelector.js';
 import Home from './components/Home.js';
 import User from './components/User.js';
 import PODs from './components/PODs.js';
 import KVs from './components/KVs.js';
+import DOCs from './components/DOCs.js';
 
 
 
 function Settings() {
   return (<h2>Settings</h2>);
-}
-
-function DOCs() {
-  return (<h2>DOCs</h2>);
 }
 
 function App() {
@@ -67,10 +63,10 @@ function App() {
                   <PODs apiEndpoint={apiEndpoint} user={user} password={password} />
                 </Route>
                 <Route path="/kvs">
-                  <KVs apiEndpoint={apiEndpoint} user={user} password={password} mnemonic={mnemonic} address={address}/>
+                  <KVs apiEndpoint={apiEndpoint} />
                 </Route>
                 <Route path="/docs">
-                  <DOCs />
+                  <DOCs apiEndpoint={apiEndpoint}  />
                 </Route>
                 <Route path="/" exact>
                   <Home />
