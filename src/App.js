@@ -17,7 +17,7 @@ function Settings() {
 
 function App() {
   const [apiEndpoint, setApiEndpoint] = useState('https://api.fairos.io');
-  const [user, setUser] = useState(localStorage.getItem("user") ? null : 'testx12345612');
+  const [user, setUser] = useState(localStorage.getItem("user") ? null : 'testx12345612xx99');
   const [password, setPassword] = useState('testx12345612testx12345612');
   const [mnemonic, setMnemonic] = useState([]);
   const [address, setAddress]   = useState('0x');

@@ -52,22 +52,25 @@
 input {
   color: rgb(255, 215, 140);
   background: rgb(110, 110, 110);
-  border: 1px dotted;
+  border: 1px inset;
   border-radius: 5px;
   border-color: rgb(216, 140, 0);
-  min-height: 2em;
+  min-height: 1.3em;
   max-width: 80%;
+  min-width: 75%;
+  right: 10px;
   font-size: calc(7px + 1vmin);
 }
 textarea {
   color: rgb(255, 215, 140);
   background: rgb(110, 110, 110);
-  border: 1px dotted;
+  border: 1px inset;
   border-radius: 5px;
   border-color: rgb(216, 140, 0);
   min-height: 2em;
-  min-width: 95%;
-  font-size: calc(7px + 1vmin);
+  min-width: 75%;
+  font-size: calc(6px + 0.5vmin);
+  white-space: nowrap;
 }
 
 a {
@@ -101,11 +104,11 @@ a:hover  {
 .fairLink {
   font-weight: 500;
   font-size: calc(8px + 1vmin);
-  padding: 2px 5px 2px 5px;
+  padding: 3px 5px 2px 5px;
   margin: 5px 5px 5px 5px;
   display: inline-block;
   border-style: solid;
-  border-radius: 8px;
+  border-radius: 20px;
   background: rgb(212, 208, 199);
   border-color: rgb(212, 208, 199);
   animation-name: buttonAppear;
@@ -116,16 +119,29 @@ a:hover  {
   animation-name: buttonAppear;
   animation-duration: 1s;    
 }
+.fairDrop {
+  font-weight: 500;
+  font-size: calc(8px + 0.5vmin);
+  padding: 2px 5px 2px 5px;
+  margin: 5px 5px 5px 5px;
+  display: inline-block;
+  border-style: solid;
+  border-radius: 25px;
+  border-color: rgb(212, 208, 199);
+  animation-name: buttonAppear;
+  animation-duration: 1s;  
+}
 
 .sideBySide{
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 30% 70%;
   min-height: 70vmin;
 }
 .leftSide {
 }
 .rightSide {
   margin-left: 20px;
+  overflow-wrap: anywhere;
 }
 
 .padLeft {

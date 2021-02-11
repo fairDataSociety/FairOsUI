@@ -1,9 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FairLink, FairOSApi } from './FairLink'; 
+import {useDropzone} from 'react-dropzone';
+
+function toUTF8Array(str) {
+    var utf8 = [];
+    for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | (charcode >> 6), 
+                      0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | (charcode >> 12), 
+                      0x80 | ((charcode>>6) & 0x3f), 
+                      0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+            i++;
+            // UTF-16 encodes 0x10000-0x10FFFF by
+            // subtracting 0x10000 and splitting the
+            // 20 bits of 0x0-0xFFFFF into two halves
+            charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                      | (str.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charcode >>18), 
+                      0x80 | ((charcode>>12) & 0x3f), 
+                      0x80 | ((charcode>>6) & 0x3f), 
+                      0x80 | (charcode & 0x3f));
+        }
+    }
+    return utf8;
+}
+
+function MyDropzone(props) {
+  const onDrop = useCallback((acceptedFiles) => {
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader()
+
+      reader.onabort = () => console.log('file reading was aborted')
+      reader.onerror = () => console.log('file reading has failed')
+      reader.onload = () => {
+        //console.log(reader.result)
+        props.onRead(reader.result);
+      }
+      reader.readAsText(file) //reader.readAsArrayBuffer(file)
+    })
+    
+  }, [])
+  const {getRootProps, getInputProps} = useDropzone({onDrop})
+
+  return (
+    <div {...getRootProps()} className="fairDrop">
+      <input {...getInputProps()} />
+      <p>JSON drop or click </p>
+    </div>
+  )
+}
 
 const DOCs = (props) =>  {
     const [apiEndpoint, setApiEndpoint] = useState(props.apiEndpoint); // 
     const [documentTableName, setDocumentTableName] = useState(''); // 
+    const [documentIndexes, setDocumentIndexes] = useState('id=number,timestamp=string,tags=map'); // 
+    
     const [documentId, setDocumentId] = useState(''); // 
     const [docKey, setDocKey] = useState("key"+Math.floor(Math.random() * 1000)); //
     const [docValue, setDocValue] = useState(1); // 
@@ -14,7 +73,7 @@ const DOCs = (props) =>  {
 
     const [jsonFile, setJsonFile] = useState('{"jsonSample":"jsonValue"}'); // 
     const [podFile, setPodFile] = useState('{"podSample":"podValue"}'); // 
-    const [jsonDocumentInBytes, setJsonDocumentInBytes] = useState(null); // 
+    const [jsonDocumentInBytes, setJsonDocumentInBytes] = useState(""); // 
 
     const [status, setStatus] = useState(null);    // 
     const [error, setError] = useState(null);    //     
@@ -37,6 +96,17 @@ const DOCs = (props) =>  {
     docData.append("limit", noRecords); 
     docData.append("expr", expression); 
     docData.append("id", documentId); 
+    //docData.append("si", documentIndexes);
+
+    function docPutData()
+    {
+        var putData = new FormData();   
+        putData.append("name", documentTableName); 
+        putData.append("doc", Buffer.from(jsonDocumentInBytes.toString())); 
+        //putData.append("doc", toUTF8Array(jsonDocumentInBytes)); 
+        
+        return putData;
+    }
     
     useEffect(() => {
         FairOSApiGetDocuments();
@@ -83,8 +153,15 @@ const DOCs = (props) =>  {
     }
     function onDOCsReceived(docsData)
     {
-        console.log(docsData);
+        //console.log(docsData);
         setDocuments(docsData["Tables"]);
+    }
+    async function loadSampleData()
+    {
+        fetch('/sample.data.json').then((r) => r.text()) // included in public folder
+        .then(text  => {
+          setJsonDocumentInBytes(text);
+        }) 
     }
     
     function FairOSApiGetDocuments()
@@ -99,7 +176,7 @@ const DOCs = (props) =>  {
     return (<>
     <div className="sideBySide">
         <div className="leftSide">
-                <h2>DOCs <strong>{documentTableName}</strong>  {status} </h2>
+                <h2>DOCs <strong>{documentTableName}</strong></h2>
                     <>
                         {documents!=null ? documents.map((d,i)=>
                             <li key={"doc" + i}>
@@ -114,32 +191,39 @@ const DOCs = (props) =>  {
                     </>    
         </div>
         <div className="rightSide">
-                    Document Name: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentTableName(e.target.value)} value={documentTableName}></input> &nbsp; {status} <br/>
+                     <input type="text" onChange={(e)=>setDocumentTableName(e.target.value)} value={documentTableName}></input> Document Name <br/>
+                     <input type="text" onChange={(e)=>setDocumentIndexes(e.target.value)} value={documentIndexes}></input> Indexes <br/>
                     <div className="fairError">{error}</div>
-                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/new'}  description={"Create New DOC"}     onResult={onStatus}   onError={onError} onAfterGet={FairOSApiGetDocuments}/> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/new'}  description={"Create New DOC"}    onResult={onStatus}   onError={onError} onAfterGet={FairOSApiGetDocuments}/> 
                     <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/open'} description={"Open"}              onResult={onStatus}   onError={onError}/> 
-                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/ls'}     description={"List"}      method="get"    onData={onDOCsReceived}  onError={onError}/> 
-                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
-                    
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/ls'}     description={"List"}     method="get"    onData={onDOCsReceived}  onError={onError}/> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError} onAfterGet={FairOSApiGetDocuments}/> 
+                    <br/> {status}
                 <hr/> 
-                    Expression: &nbsp;&nbsp;<input type="text" onChange={(e)=>setExpression(e.target.value)} value={expression} ></input> &nbsp; {statusExpression} <br/>
-                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/count'} description={"Count"} onResult={onStatusExpression}   onError={onErrorExpression} /> 
-                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/find'}  description={"Find"}  onResult={onStatusExpression}   onError={onErrorExpression} /> 
-
-                <hr/> 
-                    JSON Data: <br/><textarea type="textarea" onChange={(e)=>setJsonDocumentInBytes(e.target.value)} value={jsonDocumentInBytes} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
-                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/put'}  description={"Put"} onResult={onStatusExpression}   onError={onErrorExpression} /> <br/>
-
-                    DocumentId: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDocumentId(e.target.value)} value={documentId}></input> &nbsp; {statusExpression} <br/>
+                    {/* JSON Data:  <br/> */}
+                    <MyDropzone onRead={setJsonDocumentInBytes}/><br/>
+                    <textarea type="textarea" onChange={(e)=>setJsonDocumentInBytes(e.target.value)} value={jsonDocumentInBytes} className="textAreaInput" rows="10"></textarea> <br/>
+                    <FairLink formData={docPutData()}  url={apiEndpoint + '/v0/doc/entry/put'}  description={"Put"} onResult={onStatusExpression}   onError={onErrorExpression} /> 
+                    <button onClick={(e)=>loadSampleData()}>Fetch Sample</button> <br/> 
+                    <br/>{statusExpression}
+                <hr/>
+                    <input type="text" onChange={(e)=>setDocumentId(e.target.value)} value={documentId}></input> DocumentId<br/> 
                     <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/get?id'+documentId+'&name='+documentTableName}  description={"Get"}  method="get" onResult={onStatusExpression}   onError={onErrorExpression} /> 
-
                     <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/entry/delete'} description={"Delete*"}  method="delete" onResult={onStatus} onError={onError}/> 
+                    <br/>{statusExpression} 
                 <hr/> 
-                    JSON: <br/>
-                    <textarea type="textarea" onChange={(e)=>setJsonFile(e.target.value)} value={jsonFile} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} <br/>
+                    
+                    <textarea type="textarea" onChange={(e)=>setJsonFile(e.target.value)} value={jsonFile} className="textAreaInput" rows="5"></textarea> &nbsp; {statusExpression} JSON <br/>
 
                     <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/loadjson'} description={"Load"}  onResult={onStatus} onError={onError}/> 
                     <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/indexjson'} description={"index"}  onResult={onStatus} onError={onError}/> 
+
+                <hr/> 
+                    <input type="text" onChange={(e)=>setExpression(e.target.value)} value={expression} ></input> Expression
+                    <div className="fairError">{errorExpression}</div>
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/count'} description={"Count"} onResult={onStatusExpression}   onError={onErrorExpression} /> 
+                    <FairLink formData={docData}  url={apiEndpoint + '/v0/doc/find'}  description={"Find"}  onResult={onStatusExpression}   onError={onErrorExpression} /> 
+                    <br/> {statusExpression}                     
         </div>
     </div>
         <hr/>

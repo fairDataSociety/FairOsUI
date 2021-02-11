@@ -1,18 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { FairLink, FairOSApi } from './FairLink'; 
 
+const PODList = (props) => {
+    return(<>
+        {props.pods.map((p,i)=>
+            <li key={"pod" + i}>
+              <strong onClick={(e)=>props.selectPod(p)} className={p==props.podname ? "selected" : ""}>{p}</strong><br/>
+              {p===props.podname ?
+                <span> 
+                    <span className="padLeft" onClick={props.goFolderUp}>{props.dir_with_path}</span><br/>
+
+                    {props.dir_data.map((di,i)=>
+                        <span key={"dirEntry" + i} className="padLeft"> 
+                            { di.content_type=="inode/directory" ?
+                             <strong onClick={(e)=>props.selectFolder(di)}>&#128193; {di.name}</strong>
+                            :
+                             <span onClick={(e)=>props.selectFile(di)}>&#128452; {di.name}</span>
+                            }
+                            <br/>
+                        </span>
+                    )}
+               </span>
+               : null }
+            </li>
+        )}
+    </>)
+};
+
 const PODs = (props) => {
     const [username, setUser] = useState(props.user);         // 
     const [password, setPassword] = useState(props.password); // 
     const [podname, setPodName] = useState(props.podname);    // 
     const [status, setStatus] = useState(null);    // 
     const [dirStatus, setDirStatus] = useState(null);    // 
-    const [pod_name, setPod_name] = useState([]);    // 
+    const [podNames, setPodNames] = useState([]);    // 
+    const [sharedPodNames, setSharedPodNames] = useState([]);    // 
     const [dir_data, setDir_data] = useState([]);    // 
     var   [dir_with_path, setDir_with_path] = useState('/');    // 
+    var   [shareHash, setShareHash] = useState('');    // 
     const [error, setError] = useState(null);    // 
     const [dirError, setDirError] = useState(null);    // 
+    const [shareError, setShareError] = useState(null);    // 
+    const [shareStatus, setShareStatus] = useState(null);    // 
     const [apiEndpoint] = useState(props.apiEndpoint);    // 
+    const [podShareReference, setPodShareReference] = useState(null);    // 
 
     const podData = new FormData();   
     podData.append("user", username); 
@@ -56,16 +87,37 @@ const PODs = (props) => {
            setDirError(response.toString());
         setDirStatus(null);
     }
+    function onShareError(response)
+    {
+        console.error("PODs", response);
+        if(response!=undefined)
+           setShareError(response.toString());
+        setShareStatus(null);
+    }
     function onPodsReceived(podData)
     {
-        //console.log(podData,podData["pod_name"]);
-        setPod_name(podData["pod_name"]);
+        //console.log(podData);
+        setPodNames(podData["pod_name"]);
+        setSharedPodNames(podData["shared_pod_name"]);
     }
     function onDirectoryList(entries)
     {
-        console.log(entries);
+        //console.log(entries);
         setDir_data(entries["entries"]);
     }
+    function onShareResultOk(result)
+    {
+        console.log(result);
+        //setDir_data(entries["entries"]);
+        setPodShareReference(result.pod_sharing_reference);
+        setShareError(null)
+    }
+    function onReceiveResultOk(result)
+    {
+        console.log(result);
+        //setDir_data(entries["entries"]);
+    }
+
     function FairOSApiGetPods()
     {
         FairOSApi("get", apiEndpoint + '/v0/pod/ls', podData, onPodsReceived, onResultOk, onError, undefined, undefined)
@@ -81,9 +133,9 @@ const PODs = (props) => {
     function FairOSApiGetDirectory(obj, path)
     {
         if(path===undefined)
-           FairOSApi("get", apiEndpoint + '/v0/dir/ls?dir='+dir_with_path, podData, onDirectoryList, onDirResultOk, onDirError, undefined, undefined)
+           FairOSApi("get", apiEndpoint + '/v0/dir/ls?dir='+dir_with_path, podData, onDirectoryList, undefined/*onDirResultOk*/, onDirError, undefined, undefined)
         else 
-           FairOSApi("get", apiEndpoint + '/v0/dir/ls?dir='+path, podData, onDirectoryList, onDirResultOk, onDirError, undefined, undefined)
+           FairOSApi("get", apiEndpoint + '/v0/dir/ls?dir='+path, podData, onDirectoryList, undefined/*onDirResultOk*/, onDirError, undefined, undefined)
     }
     async function selectPod(podName)
     {
@@ -126,38 +178,18 @@ const PODs = (props) => {
         <div className="sideBySide">
             <div className="leftSide">
                 <h2>POD <strong>{podname}</strong></h2>
-                <>
-                {pod_name.map((p,i)=>
-                    <li key={"pod" + i}>
-                      <strong onClick={(e)=>selectPod(p)} className={p==podname ? "selected" : ""}>{p}</strong><br/>
+                <PODList podname={podname} pods={podNames} dir_with_path={dir_with_path} dir_data={dir_data}
+                         selectPod={selectPod} goFolderUp={goFolderUp} selectFile={selectFile} selectFolder={selectFolder}/>
 
-                      {p===podname ?
-                        <span> 
-                            <span className="padLeft" onClick={goFolderUp}>{dir_with_path}</span><br/>
+                <PODList podname={podname} pods={sharedPodNames} dir_with_path={dir_with_path} dir_data={dir_data}
+                         selectPod={selectPod} goFolderUp={goFolderUp} selectFile={selectFile} selectFolder={selectFolder}/>
 
-                            {dir_data.map((di,i)=>
-                                <span key={"dirEntry" + i} className="padLeft"> 
-                                    { di.content_type=="inode/directory" ?
-                                     <strong onClick={(e)=>selectFolder(di)}>&#128193; {di.name}</strong>
-                                    :
-                                     <span onClick={(e)=>selectFile(di)}>&#128452; {di.name}</span>
-                                    }
-                                    <br/>
-                                </span>
-                            )}
-                       </span>
-                       : null }
-                    </li>
-                )}
-
-                
-                </>  
             </div>        
             <div className="rightSide">
 
                 {/* Username: &nbsp;<input type="text" onChange={(e)=>setUser(e.target.value)} value={username}></input><br/> */}
                 {/* Password: &nbsp;&nbsp;<input type="password" onChange={(e)=>setPassword(e.target.value)} value={password}></input> <br/> */}
-                Pod: &nbsp;&nbsp;<input type="text" onChange={(e)=>setPodName(e.target.value)} value={podname}></input> &nbsp; {status} <br/>
+                <input type="text" onChange={(e)=>setPodName(e.target.value)} value={podname}></input> Pod Name<br/>
                 <div className="fairError">{error}</div>
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/new'} description={"Create New Pod"}      onResult={onResultOk}   onError={onError} onAfterGet={FairOSApiGetPods}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/open'} description={"Open"}               onResult={onResultOk}   onError={onError} onAfterGet={FairOSApiGetDirectory}/> 
@@ -166,15 +198,25 @@ const PODs = (props) => {
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/sync'} description={"Sync"}               onResult={onResultOk}   onError={onError}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/stat?user='+username + "&pod="+podname} description={"Stat"}  method="get" onResult={onResultOk} onError={onError}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/delete'} description={"Delete*"}  method="delete" onResult={onResultOk} onError={onError}/> 
+                <br/> {status}
             <hr/> 
          
-            Directory: &nbsp;&nbsp;<input type="text" onChange={(e)=>setDir_with_path(e.target.value)} value={dir_with_path}></input><br/>
+            <input type="text" onChange={(e)=>setDir_with_path(e.target.value)} value={dir_with_path}></input> Directory<br/>
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/mkdir'} description={"Make Directory"}  onResult={onDirResultOk}  onError={onDirError} />  
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/rmdir'} description={"Remove Directory"}  method="delete" onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiGetDirectory}/>  
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/ls?dir='+dir_with_path} description={"List"} method="get" onData={onDirectoryList} onResult={onDirResultOk}  onError={onDirError} />  
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/stat?dir='+dir_with_path} description={"Stat"}  method="get" onResult={onDirResultOk}  onError={onDirError} />  
             <div className="fairError">{dirError}</div>
-            &nbsp; {dirStatus} <br/>
+            {dirStatus} <br/>
+            <hr/>
+
+            <input type="text" onChange={(e)=>setShareHash(e.target.value)} value={shareHash}></input> Share Hash<br/> 
+            <div className="fairError">{shareError}</div>
+            <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/share'} description={"Share"}  onData={onShareResultOk}  onError={onShareError} />  
+            <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/receive?ref='+shareHash} description={"Receive"}  method="get" onResult={onReceiveResultOk}  onError={onShareError} onAfterGet={FairOSApiGetDirectory}/>  
+            <br/> {shareStatus} <br/>
+            
+            {podShareReference != null ? <span>Share Reference: <small><small><small>{podShareReference}</small></small></small></span> : null}
             </div>
         </div>
         <hr/> 
