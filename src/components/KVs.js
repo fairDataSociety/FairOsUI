@@ -84,7 +84,7 @@ const KVs = (props) =>  {
     function onCountReceived(countData)
     {
         //console.log(countData.message.match(/\d+/g)[1]);
-        setKvNoRecords(countData.message.match(/\d+/g)[1]); // extract number from message
+        setKvNoRecords(countData.message.match(/\d+/g)[0]); // extract number from message
     }
     
     function onStatusKeyValue(kvData)
@@ -176,7 +176,7 @@ const KVs = (props) =>  {
                 <br/>{statusKey} 
             <hr/> 
                 <div className="fairError">{errorSeekKey}</div>       
-                <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/count'} description={"Count: "+kvNoRecords}  onResult={onStatusSeekKey}   onError={onErrorSeekKey}/> 
+                <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/count'} description={"Count: "+kvNoRecords} onData={onCountReceived} onResult={onStatusSeekKey}   onError={onErrorSeekKey}/> 
                 <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/seek'} description={"Seek"}          onResult={onStatusSeekKey}   onError={onErrorSeekKey}/> 
                 {/* <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/seek/next'}   description={"Next"} method="get"  onData={onKeyReceived} onResult={onStatusSeekKey} onError={onErrorSeekKey}/>  */}
                 <FairLink formData={kvData}  url={apiEndpoint + '/v0/kv/seek/next?name='+kvTableName}   description={"Next"} method="get"  onData={onKeyReceived} onResult={onStatusSeekKey} onError={onErrorSeekKey}/>
