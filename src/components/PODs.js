@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FairLink, FairOSApi } from './FairLink'; 
+import { FairLink, FairOSApi, FairOSPost } from './FairLink'; 
+import FileDropzone from './FileDropzone';
 
 const PODList = (props) => {
     return(<>
@@ -44,6 +45,9 @@ const PODs = (props) => {
     const [shareStatus, setShareStatus] = useState(null);    // 
     const [apiEndpoint] = useState(props.apiEndpoint);    // 
     const [podShareReference, setPodShareReference] = useState(null);    // 
+    var   [selectedFile, setSelectedFile] = useState(props.selectFile);    // 
+
+    const [fileReferences, setFileReferences] = useState([]);    // {file_name:"file",reference:"0x"},{file_name:"file2",reference:"0x2"}
 
     const podData = new FormData();   
     podData.append("user", username); 
@@ -124,18 +128,16 @@ const PODs = (props) => {
     }
     function FairOSApiOpenPod()
     {
-        FairOSApi("post", apiEndpoint + '/v0/pod/open', podData, undefined, onResultOk, onError, FairOSApiGetDirectory, undefined)
+        FairOSApi("post", apiEndpoint + '/v0/pod/open', podData, undefined, onResultOk, onError, FairOSApiListDirectory, undefined)
     }
     function FairOSApiClosePod()
     {
         FairOSApi("post", apiEndpoint + '/v0/pod/close', podData, undefined, onResultOk, onError, undefined, undefined)
     }
-    function FairOSApiGetDirectory(obj, path)
+    function FairOSApiListDirectory(obj, path)
     {
-        if(path===undefined)
-           FairOSApi("get", apiEndpoint + '/v0/dir/ls?dir='+dir_with_path, podData, onDirectoryList, undefined/*onDirResultOk*/, onDirError, undefined, undefined)
-        else 
-           FairOSApi("get", apiEndpoint + '/v0/dir/ls?dir='+path, podData, onDirectoryList, undefined/*onDirResultOk*/, onDirError, undefined, undefined)
+        var constructURL = apiEndpoint + '/v0/dir/ls?dir=' + (path===undefined ? dir_with_path: path);
+        FairOSApi("get", constructURL, podData, onDirectoryList, undefined/*onDirResultOk*/, onDirError, undefined, undefined)
     }
     async function selectPod(podName)
     {
@@ -150,27 +152,55 @@ const PODs = (props) => {
     function selectFolder(folderName)
     {
         var newPath = dir_with_path;
-
         if(newPath==="/") 
            newPath = dir_with_path + folderName.name;
         else 
            newPath = dir_with_path + "/" + folderName.name;
 
         setDir_with_path(newPath);
-        FairOSApiGetDirectory(null, newPath);
+        FairOSApiListDirectory(null, newPath);
     }
     function goFolderUp()
     {
         setDir_data([]);
-        dir_with_path = dir_with_path.substring(0, dir_with_path.lastIndexOf("/") + 1);
-        setDir_with_path(dir_with_path);
-        FairOSApiGetDirectory(null, dir_with_path);
+        var newPath = dir_with_path.substring(0, dir_with_path.lastIndexOf("/") + 1);
+        setDir_with_path(newPath);
+        FairOSApiListDirectory(null, newPath);
     }
-    function selectFile(fileName)
+    function selectFile(file)
     {
-        console.log(fileName);
+        console.log(file);
+        props.onFileSelect(file);
+        setSelectedFile(file);
         //podData.set("pod", podName);         
         //FairOSApiOpenPod();
+    }
+    function onFileReferences(data)
+    {
+        console.log("got file refs", data.References);
+        setFileReferences(data.References);
+
+        FairOSApiListDirectory(null, dir_with_path);
+    }
+    function onFilesReceived(files, dir)
+    {
+        console.log(files);
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append("files", file);  
+        });
+        formData.append("pod_dir", dir);
+        formData.append("block_size", "64Mb");
+        
+        FairOSApi("POST", apiEndpoint + "/v0/file/upload", formData, onFileReferences, undefined/*onResult*/, undefined/*onError*/, undefined /*onAfterGet*/, undefined/*onAfterPost*/, undefined  /*on progress */)
+        //FairOSApiListDirectory();
+    }
+    function createFileDataForm()
+    {
+        var fData = new FormData();   
+        fData.append("file", dir_with_path + selectedFile.name); 
+
+        return fData;
     }
 
     return (
@@ -181,9 +211,10 @@ const PODs = (props) => {
                 <PODList podname={podname} pods={podNames} dir_with_path={dir_with_path} dir_data={dir_data}
                          selectPod={selectPod} goFolderUp={goFolderUp} selectFile={selectFile} selectFolder={selectFolder}/>
 
+                <br/><strong>SHARED</strong>
                 <PODList podname={podname} pods={sharedPodNames} dir_with_path={dir_with_path} dir_data={dir_data}
                          selectPod={selectPod} goFolderUp={goFolderUp} selectFile={selectFile} selectFolder={selectFolder}/>
-
+            
             </div>        
             <div className="rightSide">
 
@@ -192,7 +223,7 @@ const PODs = (props) => {
                 <input type="text" onChange={(e)=>setPodName(e.target.value)} value={podname}></input> Pod Name<br/>
                 <div className="fairError">{error}</div>
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/new'} description={"Create New Pod"}      onResult={onResultOk}   onError={onError} onAfterGet={FairOSApiGetPods}/> 
-                <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/open'} description={"Open"}               onResult={onResultOk}   onError={onError} onAfterGet={FairOSApiGetDirectory}/> 
+                <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/open'} description={"Open"}               onResult={onResultOk}   onError={onError} onAfterGet={FairOSApiListDirectory}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/close'} description={"Close"}             onResult={onResultOk}   onError={onError}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/ls'}   description={"List"}  method="get" onData={onPodsReceived} onResult={onResultOk} onError={onError}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/sync'} description={"Sync"}               onResult={onResultOk}   onError={onError}/> 
@@ -203,23 +234,45 @@ const PODs = (props) => {
          
             <input type="text" onChange={(e)=>setDir_with_path(e.target.value)} value={dir_with_path}></input> Directory<br/>
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/mkdir'} description={"Make Directory"}  onResult={onDirResultOk}  onError={onDirError} />  
-            <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/rmdir'} description={"Remove Directory"}  method="delete" onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiGetDirectory}/>  
+            <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/rmdir'} description={"Remove Directory"}  method="delete" onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiListDirectory}/>  
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/ls?dir='+dir_with_path} description={"List"} method="get" onData={onDirectoryList} onResult={onDirResultOk}  onError={onDirError} />  
             <FairLink formData={dirData()}  url={apiEndpoint + '/v0/dir/stat?dir='+dir_with_path} description={"Stat"}  method="get" onResult={onDirResultOk}  onError={onDirError} />  
             <div className="fairError">{dirError}</div>
-            {dirStatus} <br/>
+            {dirStatus}
+            <hr/>
+            <FileDropzone onFiles={onFilesReceived} text={"Drop Or Click To Upload files"} dir={dir_with_path}/>
+            {selectedFile!=null ?
+                <FairLink formData={dirData()}  url={apiEndpoint + '/v0/file/download'} 
+                      description={"Download"}  
+                      onCreateFormData={createFileDataForm} responseType={"blob"}
+                      onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiListDirectory}/>  
+                : null}
+            <FairLink formData={dirData()}  url={apiEndpoint + '/v0/file/delete'} 
+                      description={"Delete " + (selectedFile!=null ? selectedFile.name : "")}  
+                      method="delete" onCreateFormData={createFileDataForm}
+                      onResult={onDirResultOk}  onError={onDirError} onAfterGet={FairOSApiListDirectory}/>  
             <hr/>
 
             <input type="text" onChange={(e)=>setShareHash(e.target.value)} value={shareHash}></input> Share Hash<br/> 
             <div className="fairError">{shareError}</div>
             <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/share'} description={"Share"}  onData={onShareResultOk}  onError={onShareError} />  
-            <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/receive?ref='+shareHash} description={"Receive"}  method="get" onResult={onReceiveResultOk}  onError={onShareError} onAfterGet={FairOSApiGetDirectory}/>  
+            <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/receive?ref='+shareHash} description={"Receive"}  method="get" onResult={onReceiveResultOk}  onError={onShareError} onAfterGet={FairOSApiListDirectory}/>  
             <br/> {shareStatus} <br/>
             
             {podShareReference != null ? <span>Share Reference: <small><small><small>{podShareReference}</small></small></small></span> : null}
+                <div className="files"> 
+                    {fileReferences.map((fr,i)=>
+                        <span key={"fr"+fr.fileReferences+fr.reference}>{fr.file_name} {fr.error} <small>{fr.reference}</small> <br/></span>
+                    )}  
+                </div>                 
             </div>
         </div>
         <hr/> 
+
+     
+
+        {window.showDebug==true ? 
+        <>
             <ul> <strong>POD APIs</strong>
                 <li>POST -F 'password=\{password}' -F 'pod=\{podname}' {apiEndpoint}/v0/pod/new</li>
                 <li>POST -F 'password=\{password}' -F 'pod=\{podname}' {apiEndpoint}/v0/pod/open</li>
@@ -236,6 +289,13 @@ const PODs = (props) => {
                 <li>GET -F 'dir={dir_with_path}' {apiEndpoint}/v0/dir/ls</li>
                 <li>GET -F 'dir={dir_with_path}' {apiEndpoint}/v0/dir/stat</li>
             </ul>
+            <ul> <strong>File</strong>
+                <li>upload</li>
+                <li>POST -F 'file=\{selectedFile!=null ? selectedFile.name : "no file selected"}' {apiEndpoint}/v0/file/download</li>
+                <li>DELETE -F 'file=\{selectedFile!=null ? selectedFile.name : "no file selected"}'  {apiEndpoint}/v0/file/delete</li>
+            </ul>
+        </> 
+        : null }
         </>
         );
   }

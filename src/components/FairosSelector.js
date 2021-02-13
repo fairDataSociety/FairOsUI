@@ -55,12 +55,20 @@ const CustomMenu = React.forwardRef(
 
 const FairosSelector = (props) => {
     const [apiSelector, setApiSelector] = useState(props.apiEndpoint);
+    const [debug, setDebug] = useState(window.showDebug);
     function change(e)
     {
         props.onSelectEndpoint(e);
         setApiSelector(e);
     }
+    function toggleDebug()
+    {
+       window.showDebug = !window.showDebug;
+       setDebug(window.showDebug)
+    }
+
     return (
+      <>
         <div className="customdropdown">
             <Dropdown >
                 <Dropdown.Toggle as={CustomToggle} variant="success" id="dropdown-fairosapiselector" >
@@ -76,7 +84,9 @@ const FairosSelector = (props) => {
                 ))}
                 </Dropdown.Menu>
             </Dropdown>
-      </div>
+        </div>
+        <button onClick={toggleDebug}>debug {window.showDebug==true ? "on" : "off"}</button>
+      </>
     )
   }
 

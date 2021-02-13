@@ -9,10 +9,13 @@ import PODs from './components/PODs.js';
 import KVs from './components/KVs.js';
 import DOCs from './components/DOCs.js';
 
-
+window.showDebug = false;
 
 function Settings() {
   return (<h2>Settings</h2>);
+}
+function Loader() {
+  return (<div className="loader">&#1421;</div>);
 }
 
 function App() {
@@ -21,8 +24,12 @@ function App() {
   const [password, setPassword] = useState('testx12345612testx12345612');
   const [mnemonic, setMnemonic] = useState([]);
   const [address, setAddress]   = useState('0x');
-  const [loginStatus, setLoginStatus]   = useState('not logged in');
+  const [loginStatus, setLoginStatus] = useState('not logged in');
   const [isLoggedIn, setIsLoggedIn]   = useState(false);
+  var   [fileSelect, setFileSelect]   = useState(null);
+  var   [isLoading, setIsLoading]   = useState(false);
+
+  window.setIsLoading = setIsLoading; 
 
   function onSignup(data)
   {
@@ -33,7 +40,7 @@ function App() {
   {
     setMnemonic(mnemonic);
   }
-
+ 
   return (
     <div className="App">
       <Router>      
@@ -53,9 +60,12 @@ function App() {
         <div className="App-banner">{loginStatus} </div> 
         <div className="App-body">
           <Switch>
+              <Route path="/" exact>
+                  <Home />
+              </Route>
+              
               <Route path="/about">
                 <FairosSelector  onSelectEndpoint={setApiEndpoint} apiEndpoint={apiEndpoint}/>
-                <Settings />
               </Route>
               <Route path="/user">
                   <User apiEndpoint={apiEndpoint} user={user} password={password} mnemonic={mnemonic}  address={address} onNewMnemonic={onNewMnemonic} onPassword={setPassword} onLoginStatusChange={setLoginStatus} isLoggedIn={setIsLoggedIn} onSignUp={onSignup}/>
@@ -66,7 +76,7 @@ function App() {
               {isLoggedIn===true ?
               <>
                 <Route path="/pods">
-                  <PODs apiEndpoint={apiEndpoint} user={user} password={password} />
+                  <PODs apiEndpoint={apiEndpoint} user={user} password={password} onFileSelect={setFileSelect} selectedFile={fileSelect}/>
                 </Route>
                 <Route path="/kvs">
                   <KVs apiEndpoint={apiEndpoint} />
@@ -74,12 +84,12 @@ function App() {
                 <Route path="/docs">
                   <DOCs apiEndpoint={apiEndpoint}  />
                 </Route>
-                <Route path="/" exact>
-                  <Home />
-                </Route>
               </>            
               : null }
+
+           
             </Switch>
+            {isLoading ? <Loader/> : null}
         </div>
       </Router>
       

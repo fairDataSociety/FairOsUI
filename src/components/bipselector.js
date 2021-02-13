@@ -29,7 +29,7 @@ const BipSelector = (props) => {
     return (
         <div className="Bip39">
                <span>Mnemonic: </span>
-                <input type="text" style={{width:'80%'}} onChange={(e)=>setNewMnemonic(e.target.value)} value={mnemonic.toString()}>
+                <input type="text" style={{width:'80%'}} onChange={(e)=>setNewMnemonic(e.target.value)} value={mnemonic.toString().replace(/,/g," ")}>
                 </input>
                 <button onClick={()=>refreshMnemonic()}>&#x1f5d8;</button>
         </div>

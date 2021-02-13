@@ -48,6 +48,10 @@
   from {background-color: rgb(216, 140, 0);}
   to {background-color: rgb(212, 208, 199);}
 }
+@keyframes loaderIcon {
+  from {background-color: rgb(216, 140, 0);}
+  to {background-color: rgb(212, 208, 199);}
+}
 
 input {
   color: rgb(255, 215, 140);
@@ -60,6 +64,7 @@ input {
   min-width: 75%;
   right: 10px;
   font-size: calc(7px + 1vmin);
+  padding: 0px 0px 0px 5px;
 }
 textarea {
   color: rgb(255, 215, 140);
@@ -69,8 +74,9 @@ textarea {
   border-color: rgb(216, 140, 0);
   min-height: 2em;
   min-width: 75%;
-  font-size: calc(6px + 0.5vmin);
+  font-size: calc(5px + 0.7vmin);
   white-space: nowrap;
+  padding: 0px 0px 0px 5px;
 }
 
 a {
@@ -138,6 +144,7 @@ a:hover  {
   min-height: 70vmin;
 }
 .leftSide {
+  overflow-wrap: anywhere;
 }
 .rightSide {
   margin-left: 20px;
@@ -152,4 +159,19 @@ a:hover  {
 }
 .selected {
   color: rgb(255, 166, 151);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  /* animation-name: loaderIcon; */
+  animation: spin 6s linear infinite;
+  animation-duration: 1s;
+  font-size: 2.5em;
 }

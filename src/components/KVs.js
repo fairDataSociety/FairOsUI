@@ -71,11 +71,11 @@ const KVs = (props) =>  {
     
     function onKeyReceived(keyData)
     {
-        console.log(keyData);
+        //console.log(keyData);
         if(keyData.names!=undefined)
         {
-            console.log(keyData.names[0]);
-            console.log(atob(keyData.values));
+            //console.log(keyData.names[0]);
+            //console.log(atob(keyData.values));
 
             tableValues.push({name:keyData.names[0], value:atob(keyData.values)});
             setTableValues(tableValues);
@@ -89,7 +89,7 @@ const KVs = (props) =>  {
     
     function onStatusKeyValue(kvData)
     {
-        console.log(kvData);
+        //console.log(kvData);
         setStatusKey(kvData);
         //setTables(kvData["Tables"]);
         var o = JSON.parse(kvData);
@@ -106,7 +106,7 @@ const KVs = (props) =>  {
     }
     function onStatusSeekKey(response)
     {
-        console.error("KVs", response);
+        //console.error("KVs", response);
         if(response!=undefined)
             setStatusSeekKey(response.toString());
         setErrorSeekKey(null);
@@ -114,14 +114,14 @@ const KVs = (props) =>  {
     }
     function onErrorKey(response)
     {
-        console.error("KVs", response);
+        //console.error("KVs", response);
         if(response!=undefined)
            setErrorKey(response.toString());
         setStatusKey(null);
     }
     function onErrorSeekKey(response)
     {
-        console.error("KVs", response);
+        //console.error("KVs", response);
         if(response!=undefined)
              setErrorSeekKey(response.toString());
         setStatus(null);
@@ -196,27 +196,31 @@ const KVs = (props) =>  {
     </div>
 
     <hr/>
-        <ul>
-              <strong>KV Table APIs</strong>
-              <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/new</li>
-              <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/open</li>
-              <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/count</li>
-              <li>POST {apiEndpoint}/v0/kv/ls</li>
-              <li>DELETE -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/delete</li>
-        </ul>
-        <ul>
-              <strong>KV APIs</strong>
-              <li>POST -F 'file=\{kvTableName}' -F 'key={kvKey}' -F 'value=\{kvValue}' {apiEndpoint}/v0/kv/entry/put</li>
-              <li>GET -F 'file=\{kvTableName}' -F 'key={kvKey}' {apiEndpoint}/v0/kv/entry/get</li>
-              <li>DELETE -F 'file=\{kvTableName}' -F 'key={kvKey}' {apiEndpoint}/v0/kv/entry/del</li>
-        </ul>
+        {window.showDebug==true ? 
+        <>    
+            <ul>
+                <strong>KV Table APIs</strong>
+                <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/new</li>
+                <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/open</li>
+                <li>POST -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/count</li>
+                <li>POST {apiEndpoint}/v0/kv/ls</li>
+                <li>DELETE -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/delete</li>
+            </ul>
+            <ul>
+                <strong>KV APIs</strong>
+                <li>POST -F 'file=\{kvTableName}' -F 'key={kvKey}' -F 'value=\{kvValue}' {apiEndpoint}/v0/kv/entry/put</li>
+                <li>GET -F 'file=\{kvTableName}' -F 'key={kvKey}' {apiEndpoint}/v0/kv/entry/get</li>
+                <li>DELETE -F 'file=\{kvTableName}' -F 'key={kvKey}' {apiEndpoint}/v0/kv/entry/del</li>
+            </ul>
 
-        <ul>
-              <strong>CSV Seek APIs</strong>              
-              <li>POST -F 'file=\{kvTableName}' -F 'start={kvStart}' -F 'end={kvEnd}' -F 'limit={kvNoRecords}' {apiEndpoint}/v0/kv/seek</li>
-              <li>GET -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/seek/next</li>
-              <li>POST -F 'file=\{kvTableName}' -F 'csv=@{kvKey}' {apiEndpoint}/v0/kv/loadcsv</li>
-        </ul>
+            <ul>
+                <strong>CSV Seek APIs</strong>              
+                <li>POST -F 'file=\{kvTableName}' -F 'start={kvStart}' -F 'end={kvEnd}' -F 'limit={kvNoRecords}' {apiEndpoint}/v0/kv/seek</li>
+                <li>GET -F 'file=\{kvTableName}' {apiEndpoint}/v0/kv/seek/next</li>
+                <li>POST -F 'file=\{kvTableName}' -F 'csv=@{kvKey}' {apiEndpoint}/v0/kv/loadcsv</li>
+            </ul>
+        </> 
+        : null }
       </>
       );
   }
