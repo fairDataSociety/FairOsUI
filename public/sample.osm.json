@@ -1,0 +1,10 @@
+{
+  "type": "node",
+  "id": 172251,
+  "lat": 46.523793600000005,
+  "lon": 6.5862822,
+  "visible": true,
+  "version": 11,
+  "timestamp": "2016-01-15T18:01:18Z",
+  "tags": { "highway": "motorway_junction", "name": "St-Sulpice", "ref": "2" }
+}

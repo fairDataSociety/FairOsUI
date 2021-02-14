@@ -32,6 +32,7 @@ const PODs = (props) => {
     const [username, setUser] = useState(props.user);         // 
     const [password, setPassword] = useState(props.password); // 
     const [podname, setPodName] = useState(props.podname);    // 
+    const [podref, setPodRef] = useState('0x');    // 
     const [status, setStatus] = useState(null);    // 
     const [dirStatus, setDirStatus] = useState(null);    // 
     const [podNames, setPodNames] = useState([]);    // 
@@ -45,7 +46,7 @@ const PODs = (props) => {
     const [shareStatus, setShareStatus] = useState(null);    // 
     const [apiEndpoint] = useState(props.apiEndpoint);    // 
     const [podShareReference, setPodShareReference] = useState(null);    // 
-    var   [selectedFile, setSelectedFile] = useState(props.selectFile);    // 
+    var   [selectedFile, setSelectedFile] = useState(null);    // 
 
     const [fileReferences, setFileReferences] = useState([]);    // {file_name:"file",reference:"0x"},{file_name:"file2",reference:"0x2"}
 
@@ -148,6 +149,7 @@ const PODs = (props) => {
         dir_with_path = "/";
         setDir_with_path("/");
         FairOSApiOpenPod();
+        props.onPodSelect(podName);
     }
     function selectFolder(folderName)
     {
@@ -172,8 +174,6 @@ const PODs = (props) => {
         console.log(file);
         props.onFileSelect(file);
         setSelectedFile(file);
-        //podData.set("pod", podName);         
-        //FairOSApiOpenPod();
     }
     function onFileReferences(data)
     {
@@ -228,7 +228,10 @@ const PODs = (props) => {
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/ls'}   description={"List"}  method="get" onData={onPodsReceived} onResult={onResultOk} onError={onError}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/sync'} description={"Sync"}               onResult={onResultOk}   onError={onError}/> 
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/stat?user='+username + "&pod="+podname} description={"Stat"}  method="get" onResult={onResultOk} onError={onError}/> 
+                
                 <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/delete'} description={"Delete*"}  method="delete" onResult={onResultOk} onError={onError}/> 
+
+                <FairLink formData={podData}  url={apiEndpoint + '/v0/pod/receiveinfo?ref='+podref} description={"Info"}  method="get" onResult={onResultOk} onError={onError}/> 
                 <br/> {status}
             <hr/> 
          

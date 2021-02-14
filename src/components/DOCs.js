@@ -36,7 +36,7 @@ function toUTF8Array(str) {
 const DOCs = (props) =>  {
     const [apiEndpoint, setApiEndpoint] = useState(props.apiEndpoint); // 
     const [documentTableName, setDocumentTableName] = useState(''); // 
-    const [documentIndexes, setDocumentIndexes] = useState('id=number,name=string,tags=map'); // 
+    const [documentIndexes, setDocumentIndexes] = useState('name=string,tags=map'); // 
     
     const [documentId, setDocumentId] = useState(''); // 
     const [docKey, setDocKey] = useState("key"+Math.floor(Math.random() * 1000)); //
@@ -216,9 +216,9 @@ const DOCs = (props) =>  {
         console.log(countData);
         setNoRecords(countData.message);
     }
-    async function loadSampleData()
+    async function loadSampleData(localFile)
     {
-        fetch('/sample.data.json').then((r) => r.text()) // included in public folder
+        fetch(localFile).then((r) => r.text()) // included in public folder
         .then(text  => {
           setJsonDocumentInBytes(text);
         }) 
@@ -282,7 +282,9 @@ const DOCs = (props) =>  {
 
                     <div className="fairError">{errorPut}</div>
                     <FairLink formData={docPutData()}  url={apiEndpoint + '/v0/doc/entry/put'}  description={"Put"} onResult={onStatusPut}   onError={setErrorPut} /> 
-                    <button onClick={(e)=>loadSampleData()}>Fetch Sample</button> 
+                    <button onClick={(e)=>loadSampleData('/sample.osm.json')}>Fetch OSM Sample</button> 
+                    <button onClick={(e)=>loadSampleData('/sample.medicalCondition.json')}>Fetch medical Sample</button> 
+                    <button onClick={(e)=>loadSampleData('/sample.calendar.json')}>Fetch Event Sample</button> 
                     <br/>{statusPut}
                 <hr/>
                     <input type="text" onChange={(e)=>setDocumentId(e.target.value)} value={documentId}></input> DocumentId<br/> 

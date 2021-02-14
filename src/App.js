@@ -28,6 +28,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn]   = useState(false);
   var   [fileSelect, setFileSelect]   = useState(null);
   var   [isLoading, setIsLoading]   = useState(false);
+  var   [currentPod, setCurrentPod]   = useState(false);
 
   window.setIsLoading = setIsLoading; 
 
@@ -39,6 +40,11 @@ function App() {
   function onNewMnemonic(mnemonic)
   {
     setMnemonic(mnemonic);
+  }
+  function onCurrentPod(data)
+  {
+    setCurrentPod(data);
+    setLoginStatus(null);
   }
  
   return (
@@ -57,7 +63,7 @@ function App() {
               <Link to="/about">&#9881;&#128736; </Link>
               <Link to="/">&#8962;&#9432;  </Link> 
         </header>
-        <div className="App-banner">{loginStatus} </div> 
+        <div className="App-banner">{currentPod} {loginStatus} </div> 
         <div className="App-body">
           <Switch>
               <Route path="/" exact>
@@ -76,7 +82,7 @@ function App() {
               {isLoggedIn===true ?
               <>
                 <Route path="/pods">
-                  <PODs apiEndpoint={apiEndpoint} user={user} password={password} onFileSelect={setFileSelect} selectedFile={fileSelect}/>
+                  <PODs apiEndpoint={apiEndpoint} user={user} password={password} onFileSelect={setFileSelect} onPodSelect={onCurrentPod} />
                 </Route>
                 <Route path="/kvs">
                   <KVs apiEndpoint={apiEndpoint} />
