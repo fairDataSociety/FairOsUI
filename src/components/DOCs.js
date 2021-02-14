@@ -226,7 +226,10 @@ const DOCs = (props) =>  {
 
     function onGetDataFromUrl(e,url)
     {
-
+        fetch(url).then((r) => r.text()) // included in public folder
+        .then(text  => {
+          setJsonDocumentInBytes(text);
+        }) 
     }
     function onImportData(e,url)
     {
